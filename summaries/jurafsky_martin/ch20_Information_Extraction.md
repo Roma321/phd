@@ -146,12 +146,19 @@ $U$ — время высказывания
 ##### Пример из датасета TimeBank
 ```xml
 <TIMEX3 tid="t57" type="DATE" value="1989-10-26" functionInDocument="CREATION_TIME">
-10/26/89 </TIMEX3>
-Delta Air Lines earnings <EVENT eid="e1" class="OCCURRENCE"> soared </EVENT> 33% to a
-record in <TIMEX3 tid="t58" type="DATE" value="1989-Q1" anchorTimeID="t57"> the
-fiscal first quarter </TIMEX3>, <EVENT eid="e3" class="OCCURRENCE">bucking</EVENT>
-the industry trend toward <EVENT eid="e4" class="OCCURRENCE">declining</EVENT>
+  10/26/89
+</TIMEX3>
+Delta Air Lines earnings
+<EVENT eid="e1" class="OCCURRENCE">soared</EVENT>
+33% to a record in
+<TIMEX3 tid="t58" type="DATE" value="1989-Q1" anchorTimeID="t57">
+  the fiscal first quarter
+</TIMEX3>,
+<EVENT eid="e3" class="OCCURRENCE">bucking</EVENT>
+the industry trend toward
+<EVENT eid="e4" class="OCCURRENCE">declining</EVENT>
 profits.
+
 ```
 * $\text{Soaring}_{e1}$ is included in $\text{the fiscal first quarter}_{t58}$
 * $\text{Soaring}_{e1}$ is before $\text{1989-10-26}_{t57}$
@@ -195,3 +202,50 @@ A fare increase initiated last week by UAL Corp’s...
 ```
 
 #### Нормализация временных отношений
+**Временная нормализация** — это задача представления временных выражений как точки во времени или как длительности. 
+Нормализованное время обычно представляется в формате ISO
+
+```xml
+<TIMEX3 id="t1" type="DATE" value="2007-07-02" functionInDocument="CREATION_TIME">
+  July 2, 2007
+</TIMEX3>
+A fare increase initiated
+<TIMEX3 id="t2" type="DATE" value="2007-W26" anchorTimeID="t1">
+  last week
+</TIMEX3>
+by United Airlines was matched by competitors over
+<TIMEX3 id="t3" type="DURATION" value="P1WE" anchorTimeID="t1">
+  the weekend
+</TIMEX3>,
+marking the second successful fare increase in
+<TIMEX3 id="t4" type="DURATION" value="P2W" anchorTimeID="t1">
+  two weeks
+</TIMEX3>.
+```
+
+| Unit                     | Pattern             | Sample Value       |
+|--------------------------|-------------------|------------------|
+| Fully specified dates    | YYYY-MM-DD         | 1991-09-28       |
+| Weeks                    | YYYY-Wnn           | 2007-W27         |
+| Weekends                 | PnWE               | P1WE             |
+| 24-hour clock times      | HH:MM:SS           | 11:13:45         |
+| Dates and times          | YYYY-MM-DDTHH:MM:SS| 1991-09-28T11:00:00 |
+| Financial quarters       | Qn                 | 1999-Q3          |
+
+(**P** в формате ISO означает period, продолжительность)
+
+Современные подходы для нормализации времени в основном rule-based. Например, для 2 распознанных паттернов временных выражений можно определить операцию DURATION, которая определит длительность между ними.
+
+Задача нормализации времени явялется довольно сложной, поскольку в документах довольно редко встречаются чёткие указания на дату и время. Чаще они ссылаются, например, на время написания документа — эту дату называют **temporcal anchor, временным якорем**.  На основе этого якоря можно рассчитывать даты, упоминающиеся со словами *yesterday, tomorrow, next week*. Стоит отметить, что этого тоже недостаточно. Рассмотрим примеры
+
+* *Random security checks that began yesterday at Sky Harbor will continue
+at least through **the weekend**.*
+* *A fare increase initiated by United Airlines was matched by competitors over   **the weekend** marking the second successful fare increase in   two weeks*
+
+В первом случае **the weekend** ссылается на предстоящий уикэнд, а во втором — на прошедший.
+
+Это может зависеть не только от временных форм глагола. Так, выражение *в следующую пятницу*, сказанное в субботу, будет скорее всего иметь в виду ближайшую пятницу, а выражение *в следующую пятницу*, сказанное в четверг, скорее всего будет подразумевать уже не ближайшую пятницу, а ту, которая будет за ней.
+
+Такие неоднозначности обычно разрешаются разнообразными эвристиками, специфичными для языка и предметной области.
+
+#### Упорядочивание событий во времени.
